@@ -5,10 +5,10 @@
 'use strict';
 
 import { promisify } from 'util';
-import * as path from 'path';
+import path from 'path';
 import { createReadStream, promises as fs } from 'fs';
 
-import * as imagesize from 'imagesize';
+import imagesize from 'imagesize';
 
 import { IMAGES, DENSITIES } from '../constants';
 
@@ -20,9 +20,8 @@ interface ImageSizeResult {
   height: number;
 }
 
-const imageSize: (
-  v: import('stream').Readable,
-) => Promise<ImageSizeResult> = promisify(imagesize);
+const imageSize: (v: import('stream').Readable) => Promise<ImageSizeResult> =
+  promisify(imagesize);
 
 export type ImageDensity = '1x' | '2x' | '3x';
 export type ImageType =
@@ -196,21 +195,24 @@ export class PassImages extends Map<string, string | Buffer> {
       case 'icon':
         if (width < 29 * densityMulti)
           throw new TypeError(
-            `icon image must have width ${29 *
-              densityMulti}px for ${densityMulti}x density`,
+            `icon image must have width ${
+              29 * densityMulti
+            }px for ${densityMulti}x density`,
           );
         if (height < 29 * densityMulti)
           throw new TypeError(
-            `icon image must have height ${29 *
-              densityMulti}px for ${densityMulti}x density`,
+            `icon image must have height ${
+              29 * densityMulti
+            }px for ${densityMulti}x density`,
           );
         break;
 
       case 'logo':
         if (width > 160 * densityMulti)
           throw new TypeError(
-            `logo image must have width no large than ${160 *
-              densityMulti}px for ${densityMulti}x density`,
+            `logo image must have width no large than ${
+              160 * densityMulti
+            }px for ${densityMulti}x density`,
           );
         // if (height > 50 * densityMulti)
         //   throw new TypeError(
@@ -222,26 +224,30 @@ export class PassImages extends Map<string, string | Buffer> {
       case 'background':
         if (width > 180 * densityMulti)
           throw new TypeError(
-            `background image must have width ${180 *
-              densityMulti}px for ${densityMulti}x density`,
+            `background image must have width ${
+              180 * densityMulti
+            }px for ${densityMulti}x density`,
           );
         if (height > 220 * densityMulti)
           throw new TypeError(
-            `background image must have height ${220 *
-              densityMulti}px for ${densityMulti}x density`,
+            `background image must have height ${
+              220 * densityMulti
+            }px for ${densityMulti}x density`,
           );
         break;
 
       case 'footer':
         if (width > 286 * densityMulti)
           throw new TypeError(
-            `footer image must have width ${286 *
-              densityMulti}px for ${densityMulti}x density`,
+            `footer image must have width ${
+              286 * densityMulti
+            }px for ${densityMulti}x density`,
           );
         if (height > 15 * densityMulti)
           throw new TypeError(
-            `footer image must have height ${15 *
-              densityMulti}px for ${densityMulti}x density`,
+            `footer image must have height ${
+              15 * densityMulti
+            }px for ${densityMulti}x density`,
           );
         break;
 
@@ -253,21 +259,24 @@ export class PassImages extends Map<string, string | Buffer> {
         //   );
         if (height > 144 * densityMulti)
           throw new TypeError(
-            `strip image must have height ${144 *
-              densityMulti}px for ${densityMulti}x density`,
+            `strip image must have height ${
+              144 * densityMulti
+            }px for ${densityMulti}x density`,
           );
         break;
 
       case 'thumbnail':
         if (width > 120 * densityMulti)
           throw new TypeError(
-            `thumbnail image must have width no large than ${90 *
-              densityMulti}px for ${densityMulti}x density, received ${width}`,
+            `thumbnail image must have width no large than ${
+              90 * densityMulti
+            }px for ${densityMulti}x density, received ${width}`,
           );
         if (height > 150 * densityMulti)
           throw new TypeError(
-            `thumbnail image must have height ${90 *
-              densityMulti}px for ${densityMulti}x density, received ${height}`,
+            `thumbnail image must have height ${
+              90 * densityMulti
+            }px for ${densityMulti}x density, received ${height}`,
           );
         break;
     }

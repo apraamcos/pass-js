@@ -4,11 +4,11 @@
 
 'use strict';
 
-import * as http2 from 'http2';
+import http2 from 'http2';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 
-import * as forge from 'node-forge';
+import forge from 'node-forge';
 import { unsigned as crc32 } from 'buffer-crc32';
 
 import { Pass } from './pass';
@@ -16,7 +16,7 @@ import { PASS_STYLES } from './constants';
 import { PassStyle, ApplePass, Options } from './interfaces';
 import { PassBase } from './lib/base-pass';
 import { unzipBuffer } from './lib/yazul-promisified';
-import stripJsonComments from 'strip-json-comments';
+import { stripComments } from 'jsonc-parser';
 
 const {
   HTTP2_HEADER_METHOD,
@@ -79,7 +79,7 @@ export class Template extends PassBase {
       // loading main JSON file
       const jsonContent = await readFile(join(folderPath, 'pass.json'), 'utf8');
       const passJson = JSON.parse(
-        stripJsonComments(jsonContent),
+        stripComments(jsonContent),
       ) as Partial<ApplePass>;
 
       // Trying to detect the type of pass
@@ -189,7 +189,7 @@ export class Template extends PassBase {
               entry.crc32
             }, got ${crc32(buf)}`,
           );
-        const passJSON = JSON.parse(stripJsonComments(buf.toString('utf8')));
+        const passJSON = JSON.parse(stripComments(buf.toString('utf8')));
         template = new Template(
           undefined,
           passJSON,

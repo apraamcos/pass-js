@@ -11,6 +11,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "strict": true,
+    "esModuleInterop": true,
     // "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
     /* Module Resolution Options */
