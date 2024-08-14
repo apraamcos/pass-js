@@ -57,22 +57,6 @@
     "lint": "eslint \"{src,__tests__}/**/*.ts\" --ignore-pattern \"*test*\" --ignore-path .gitignore",
     "prepublishOnly": "tsc"
   },
-  "keywords": [
-    "apple",
-    "wallet",
-    "pass",
-    "passkit",
-    "iOS",
-    "generating",
-    "APN"
-  ],
-  "bugs": {
-    "url": "https://github.com/walletpass/pass-js/issues"
-  },
-  "directories": {
-    "lib": "src",
-    "test": "__tests__"
-  },
   "dependencies": {
     "buffer-crc32": "0.2.13",
     "color-name": "1.1.4",
