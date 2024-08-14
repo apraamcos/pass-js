@@ -1,20 +1,22 @@
 {
-  "name": "@walletpass/pass-js",
+  "name": "@apraamcos/pass-js",
   "description": "Apple Wallet Pass generating and pushing updates from Node.js",
   "author": "Konstantin Vyatkin <tino@vtkn.io>",
   "version": "6.9.7",
-  "homepage": "https://github.com/walletpass/pass-js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apraamcos/pass-js"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "licenses": [
     {
       "type": "MIT",
       "url": "https://github.com/walletpass/pass-js/blob/master/MIT-LICENSE"
     }
   ],
-  "funding": {
-    "type": "opencollective",
-    "url": "https://opencollective.com/walletpass"
-  },
   "engines": {
     "node": ">=10.10"
   },
@@ -31,7 +33,6 @@
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "devDependencies": {
-    "@destinationstransfers/eslint-plugin": "2.9.190",
     "@types/buffer-crc32": "0.2.0",
     "@types/color-name": "1.1.1",
     "@types/jest": "27.4.1",
@@ -44,11 +45,11 @@
     "env-app-yaml": "1.0.0",
     "eslint": "8.46.0",
     "husky": "7.0.4",
-    "jest": "27.5.1",
-    "jest-extended": "2.0.0",
-    "jest-junit": "13.0.0",
-    "lint-staged": "12.5.0",
-    "ts-jest": "27.1.4",
+    "jest": "29.7.0",
+    "jest-extended": "4.0.2",
+    "jest-junit": "16.0.0",
+    "lint-staged": "15.2.9",
+    "ts-jest": "29.2.4",
     "typescript": "4.4.4"
   },
   "scripts": {
@@ -67,10 +68,6 @@
     "generating",
     "APN"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/walletpass/pass-js.git"
-  },
   "bugs": {
     "url": "https://github.com/walletpass/pass-js/issues"
   },
