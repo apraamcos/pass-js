@@ -16,8 +16,7 @@ import { PASS_STYLES } from './constants';
 import { PassStyle, ApplePass, Options } from './interfaces';
 import { PassBase } from './lib/base-pass';
 import { unzipBuffer } from './lib/yazul-promisified';
-
-import stripJsonComments = require('strip-json-comments');
+import stripJsonComments from 'strip-json-comments';
 
 const {
   HTTP2_HEADER_METHOD,
@@ -42,7 +41,7 @@ export class Template extends PassBase {
     fields: Partial<ApplePass> = {},
     images?: import('./lib/images').PassImages,
     localization?: import('./lib/localizations').Localizations,
-    options?: Options
+    options?: Options,
   ) {
     super(fields, images, localization, options);
 
@@ -54,21 +53,21 @@ export class Template extends PassBase {
   }
 
   /**
- * Loads Template, images and key from a given path
- *
- * @static
- * @param {string} folderPath
- * @param {string} [keyPassword] - optional key password
- * @param {Options} options - settings for the lib
- * @returns {Promise.<Template>}
- * @throws - if given folder doesn't contain pass.json or it is in invalid format
- * @memberof Template
- */
+   * Loads Template, images and key from a given path
+   *
+   * @static
+   * @param {string} folderPath
+   * @param {string} [keyPassword] - optional key password
+   * @param {Options} options - settings for the lib
+   * @returns {Promise.<Template>}
+   * @throws - if given folder doesn't contain pass.json or it is in invalid format
+   * @memberof Template
+   */
   // eslint-disable-next-line max-statements, sonarjs/cognitive-complexity
   static async load(
     folderPath: string,
     keyPassword?: string,
-    options?: Options
+    options?: Options,
   ): Promise<Template> {
     // Check if the path is accessible directory actually
     const entries = await readdir(folderPath, { withFileTypes: true });
@@ -79,9 +78,9 @@ export class Template extends PassBase {
     if (entries.find(entry => entry.isFile() && entry.name === 'pass.json')) {
       // loading main JSON file
       const jsonContent = await readFile(join(folderPath, 'pass.json'), 'utf8');
-      const passJson = JSON.parse(stripJsonComments(jsonContent)) as Partial<
-        ApplePass
-      >;
+      const passJson = JSON.parse(
+        stripJsonComments(jsonContent),
+      ) as Partial<ApplePass>;
 
       // Trying to detect the type of pass
       let type: PassStyle | undefined;
@@ -160,12 +159,15 @@ export class Template extends PassBase {
   }
 
   /**
- * Load template from a given buffer with ZIPped pass/template content
- *
- * @param {Buffer} buffer
- * @param {Options} options
- */
-  static async fromBuffer(buffer: Buffer, options?: Options): Promise<Template> {
+   * Load template from a given buffer with ZIPped pass/template content
+   *
+   * @param {Buffer} buffer
+   * @param {Options} options
+   */
+  static async fromBuffer(
+    buffer: Buffer,
+    options?: Options,
+  ): Promise<Template> {
     const zip = await unzipBuffer(buffer);
     if (zip.entryCount < 1)
       throw new TypeError(`Provided ZIP buffer contains no entries`);
@@ -193,7 +195,7 @@ export class Template extends PassBase {
           passJSON,
           template.images,
           template.localization,
-          options
+          options,
         );
       } else {
         // test if it's an image
@@ -286,7 +288,7 @@ export class Template extends PassBase {
     // https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/PassKit_PG/Updating.html
     if (!this.apn || this.apn.destroyed) {
       // creating APN Provider
-      await new Promise((resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         if (!this.key)
           throw new ReferenceError(
             `Set private key before trying to push pass updates`,
@@ -357,11 +359,11 @@ export class Template extends PassBase {
       { ...this.fields, ...fields },
       this.images,
       this.localization,
-      this.options
+      this.options,
     );
   }
 }
 
-function createDefaultTemplate(options?: Options): Template{
-  return new Template(undefined, {}, undefined, undefined, options)
+function createDefaultTemplate(options?: Options): Template {
+  return new Template(undefined, {}, undefined, undefined, options);
 }
