@@ -1,9 +1,11 @@
-import * as colorNames from 'color-name';
+import colorNames from 'color-name';
 
 const ABBR_RE = /^#([\da-f])([\da-f])([\da-f])([\da-f])?$/i;
 const HEX_RE = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})([\da-f]{2})?$/i;
-const PERCENT_RE = /^rgba?\(\s*([+-]?[\d.]+)%\s*,\s*([+-]?[\d.]+)%\s*,\s*([+-]?[\d.]+)%\s*(?:,\s*([+-]?[\d.]+)\s*)?\)$/i;
-const RGBA_RE = /^rgba?\(\s*(1?\d{1,2}|2[0-4]\d|25[0-5])\s*,\s*(1?\d{1,2}|2[0-4]\d|25[0-5])\s*,\s*(1?\d{1,2}|2[0-4]\d|25[0-5])\s*(?:,\s*([+-]?[\d.]+)\s*)?\)$/i;
+const PERCENT_RE =
+  /^rgba?\(\s*([+-]?[\d.]+)%\s*,\s*([+-]?[\d.]+)%\s*,\s*([+-]?[\d.]+)%\s*(?:,\s*([+-]?[\d.]+)\s*)?\)$/i;
+const RGBA_RE =
+  /^rgba?\(\s*(1?\d{1,2}|2[0-4]\d|25[0-5])\s*,\s*(1?\d{1,2}|2[0-4]\d|25[0-5])\s*,\s*(1?\d{1,2}|2[0-4]\d|25[0-5])\s*(?:,\s*([+-]?[\d.]+)\s*)?\)$/i;
 
 function is0to255(num: number): boolean {
   if (!Number.isInteger(num)) return false;
@@ -18,7 +20,7 @@ function is0to255(num: number): boolean {
 function getRgb(colorString: string): [number, number, number] {
   // short paths
   const string = colorString.trim();
-  if (string in colorNames) return colorNames[string];
+  if (string in colorNames) return (colorNames as any)[string];
   if (/transparent/i.test(string)) return [0, 0, 0];
 
   // we don't need to recheck values because they are enforced by regexes

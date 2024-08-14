@@ -28,7 +28,7 @@ export class PassBase extends PassStructure {
     // restore via setters
     for (const [key, value] of Object.entries(fields)) {
       if (!STRUCTURE_FIELDS_SET.has(key) && key in this) {
-        this[key] = value;
+        (this as any)[key] = value;
       }
     }
 
@@ -43,7 +43,8 @@ export class PassBase extends PassStructure {
   toJSON(): Partial<ApplePass> {
     const res: Partial<ApplePass> = { formatVersion: 1 };
     for (const [field, value] of Object.entries(this.fields)) {
-      res[field] = value instanceof Date ? getW3CDateString(value) : value;
+      (res as any)[field] =
+        value instanceof Date ? getW3CDateString(value) : value;
     }
     return res;
   }
