@@ -6,7 +6,8 @@ import http2 from 'http2';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import forge from 'node-forge';
-import { createRequire } from 'module';
+// @ts-expect-error - buffer-crc32 has default export in .mjs but types say export =
+import crc32Lib from 'buffer-crc32';
 import { stripComments } from 'jsonc-parser';
 
 import { Pass } from './pass.js';
@@ -15,9 +16,10 @@ import { PassStyle, ApplePass, Options } from './interfaces.js';
 import { PassBase } from './lib/base-pass.js';
 import { unzipBuffer } from './lib/yazul-promisified.js';
 
-const require = createRequire(import.meta.url);
-const crc32Module = require('buffer-crc32');
-const crc32 = crc32Module.unsigned;
+const crc32 = (crc32Lib as any).unsigned as (
+  buffer: string | Buffer,
+  partialCrc?: Buffer | number,
+) => number;
 
 const {
   HTTP2_HEADER_METHOD,
