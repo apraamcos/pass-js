@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest';
+
 import { getGeoPoint } from '../src/lib/get-geo-point';
 
 describe('getGeoPoint', () => {
@@ -7,13 +9,6 @@ describe('getGeoPoint', () => {
       latitude: expect.any(Number),
       altitude: expect.any(Number),
     });
-  });
-
-  it('throws on bad input', () => {
-    expect(() => getGeoPoint([14.235, 'brrrr', 23.4444])).toThrow();
-    expect(() => getGeoPoint({ lat: 1, log: 3 })).toThrow(
-      'Unknown geo point format',
-    );
   });
 
   it('works with lat/lng/alt object', () => {

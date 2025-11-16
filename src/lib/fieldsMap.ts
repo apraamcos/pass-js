@@ -1,8 +1,5 @@
-'use strict';
-
-import { Field, FieldDescriptor, DataStyleFormat } from '../interfaces';
-
-import { getW3CDateString } from './w3cdate';
+import { Field, FieldDescriptor, DataStyleFormat } from '../interfaces.js';
+import { getW3CDateString } from './w3cdate.js';
 
 export class FieldsMap extends Map<string, FieldDescriptor> {
   /**
@@ -10,14 +7,11 @@ export class FieldsMap extends Map<string, FieldDescriptor> {
    */
   toJSON(): Field[] | undefined {
     if (!this.size) return undefined;
-    return [...this].map(
-      ([key, data]): Field => {
-        // Remap Date objects to string
-        if (data.value instanceof Date)
-          data.value = getW3CDateString(data.value);
-        return { key, ...data };
-      },
-    );
+    return [...this].map(([key, data]): Field => {
+      // Remap Date objects to string
+      if (data.value instanceof Date) data.value = getW3CDateString(data.value);
+      return { key, ...data };
+    });
   }
 
   /**

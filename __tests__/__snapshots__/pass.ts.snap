@@ -1,7 +1,7 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`generated should contain a manifest 1`] = `
-Object {
+exports[`generated > should contain a manifest 1`] = `
+{
   "icon.png": "e0f0bcd503f6117bce6a1a3ff8a68e36d26ae47f",
   "icon@2x.png": "10e4a72dbb02cc526cef967420553b459ccf2b9e",
   "logo.png": "abc97e3b2bc3b0e412ca4a853ba5fd90fe063551",
@@ -14,18 +14,18 @@ Object {
 }
 `;
 
-exports[`generated should contain pass.json 1`] = `
-Object {
-  "coupon": Object {
-    "headerFields": Array [
-      Object {
+exports[`generated > should contain pass.json 1`] = `
+{
+  "coupon": {
+    "headerFields": [
+      {
         "key": "date",
         "label": "Date",
         "value": "Nov 1",
       },
     ],
-    "primaryFields": Array [
-      Object {
+    "primaryFields": [
+      {
         "key": "location",
         "label": "Place",
         "value": "High ground",

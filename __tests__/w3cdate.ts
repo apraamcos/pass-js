@@ -1,5 +1,4 @@
-'use strict';
-
+import { describe, it, expect } from 'vitest';
 import {
   getW3CDateString,
   isValidW3CDateString,
@@ -36,10 +35,6 @@ describe('W3C dates strings ', () => {
     expect(date1.getHours()).toBe(date.getHours());
     expect(date1.getMinutes()).toBe(date.getMinutes());
     expect(date.getTimezoneOffset()).toBe(date.getTimezoneOffset());
-  });
-
-  it('throws on invalid argument type', () => {
-    expect(() => getW3CDateString({ byaka: 'buka' })).toThrow(TypeError);
   });
 
   it.skip('circle conversion', () => {

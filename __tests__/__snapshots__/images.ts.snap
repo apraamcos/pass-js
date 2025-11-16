@@ -1,7 +1,7 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`PassImages should read localized images 1`] = `
-Array [
+exports[`PassImages > should read localized images 1`] = `
+[
   "icon.png",
   "ru.lproj/logo.png",
   "ru.lproj/logo@2x.png",

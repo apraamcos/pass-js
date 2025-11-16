@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import { Entry, Options, ZipFile, fromBuffer as ZipFromBuffer } from 'yauzl';
 import { EventIterator } from 'event-iterator';
 
-import { streamToBuffer } from './stream-to-buffer';
+import { streamToBuffer } from './stream-to-buffer.js';
 
 // Promisifying yauzl
 Object.defineProperties(ZipFile.prototype, {

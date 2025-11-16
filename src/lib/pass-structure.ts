@@ -10,11 +10,11 @@ import {
   PassStyle,
   TransitType,
   PassCommonStructure,
-} from '../interfaces';
-import { PASS_STYLES, TRANSIT, STRUCTURE_FIELDS } from '../constants';
+} from '../interfaces.js';
+import { PASS_STYLES, TRANSIT, STRUCTURE_FIELDS } from '../constants.js';
 
-import { FieldsMap } from './fieldsMap';
-import { NFCField } from './nfc-fields';
+import { FieldsMap } from './fieldsMap.js';
+import { NFCField } from './nfc-fields.js';
 
 export class PassStructure {
   protected fields: Partial<ApplePass> = {};
@@ -31,7 +31,9 @@ export class PassStructure {
           // check NFC fields
           this.fields.nfc = new NFCField(fields.nfc);
         }
-        const structure: PassCommonStructure = (fields as any)[this.style];
+        const structure: PassCommonStructure = (
+          fields as Record<PassStyle, PassCommonStructure>
+        )[this.style];
         for (const prop of STRUCTURE_FIELDS) {
           if (prop in structure) {
             const currentProperty = structure[prop];
@@ -60,10 +62,10 @@ export class PassStructure {
   set style(v: PassStyle | undefined) {
     // remove all other styles
     for (const style of PASS_STYLES)
-      if (style !== v) delete (this.fields as any)[style];
+      if (style !== v) delete (this.fields as Record<string, unknown>)[style];
     if (!v) return;
     if (!PASS_STYLES.has(v)) throw new TypeError(`Invalid Pass type "${v}"`);
-    if (!(v in this.fields)) (this.fields as any)[v] = {};
+    if (!(v in this.fields)) (this.fields as Record<string, any>)[v] = {};
     // Add NFC fields
     if ('storeCard' in this.fields) this.fields.nfc = new NFCField();
     //   if ('boardingPass' in this.fields && this.fields.boardingPass) this.fields.boardingPass.
@@ -99,7 +101,8 @@ export class PassStructure {
 
     if (!v) {
       if (this.fields.boardingPass)
-        delete (this as any).fields.boardingPass.transitType;
+        delete (this.fields.boardingPass as { transitType?: TransitType })
+          .transitType;
     } else {
       if (Object.values(TRANSIT).includes(v)) {
         if (this.fields.boardingPass) this.fields.boardingPass.transitType = v;
@@ -131,9 +134,12 @@ export class PassStructure {
       throw new ReferenceError(
         `Pass style is undefined, set the pass style before accessing pass structure fields`,
       );
-    if (!((this.fields as any)[style].headerFields instanceof FieldsMap))
-      (this.fields as any)[style].headerFields = new FieldsMap();
-    return (this.fields as any)[style].headerFields;
+    const styleFields = (this.fields as Record<PassStyle, PassCommonStructure>)[
+      style
+    ];
+    if (!(styleFields.headerFields instanceof FieldsMap))
+      styleFields.headerFields = new FieldsMap();
+    return styleFields.headerFields as FieldsMap;
   }
   get auxiliaryFields(): FieldsMap {
     const { style } = this;
@@ -141,9 +147,12 @@ export class PassStructure {
       throw new ReferenceError(
         `Pass style is undefined, set the pass style before accessing pass structure fields`,
       );
-    if (!((this.fields as any)[style].auxiliaryFields instanceof FieldsMap))
-      (this.fields as any)[style].auxiliaryFields = new FieldsMap();
-    return (this.fields as any)[style].auxiliaryFields;
+    const styleFields = (this.fields as Record<PassStyle, PassCommonStructure>)[
+      style
+    ];
+    if (!(styleFields.auxiliaryFields instanceof FieldsMap))
+      styleFields.auxiliaryFields = new FieldsMap();
+    return styleFields.auxiliaryFields as FieldsMap;
   }
   get backFields(): FieldsMap {
     const { style } = this;
@@ -151,9 +160,12 @@ export class PassStructure {
       throw new ReferenceError(
         `Pass style is undefined, set the pass style before accessing pass structure fields`,
       );
-    if (!((this.fields as any)[style].backFields instanceof FieldsMap))
-      (this.fields as any)[style].backFields = new FieldsMap();
-    return (this.fields as any)[style].backFields;
+    const styleFields = (this.fields as Record<PassStyle, PassCommonStructure>)[
+      style
+    ];
+    if (!(styleFields.backFields instanceof FieldsMap))
+      styleFields.backFields = new FieldsMap();
+    return styleFields.backFields as FieldsMap;
   }
   get primaryFields(): FieldsMap {
     const { style } = this;
@@ -161,9 +173,12 @@ export class PassStructure {
       throw new ReferenceError(
         `Pass style is undefined, set the pass style before accessing pass structure fields`,
       );
-    if (!((this.fields as any)[style].primaryFields instanceof FieldsMap))
-      (this.fields as any)[style].primaryFields = new FieldsMap();
-    return (this.fields as any)[style].primaryFields;
+    const styleFields = (this.fields as Record<PassStyle, PassCommonStructure>)[
+      style
+    ];
+    if (!(styleFields.primaryFields instanceof FieldsMap))
+      styleFields.primaryFields = new FieldsMap();
+    return styleFields.primaryFields as FieldsMap;
   }
   get secondaryFields(): FieldsMap {
     const { style } = this;
@@ -171,8 +186,11 @@ export class PassStructure {
       throw new ReferenceError(
         `Pass style is undefined, set the pass style before accessing pass structure fields`,
       );
-    if (!((this.fields as any)[style].secondaryFields instanceof FieldsMap))
-      (this.fields as any)[style].secondaryFields = new FieldsMap();
-    return (this.fields as any)[style].secondaryFields;
+    const styleFields = (this.fields as Record<PassStyle, PassCommonStructure>)[
+      style
+    ];
+    if (!(styleFields.secondaryFields instanceof FieldsMap))
+      styleFields.secondaryFields = new FieldsMap();
+    return styleFields.secondaryFields as FieldsMap;
   }
 }

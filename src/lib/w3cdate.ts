@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Checks if given string is a valid W3C date representation
  *
@@ -29,18 +27,9 @@ export function getW3CDateString(value: string | Date): string {
   const date = value instanceof Date ? value : new Date(value);
   // creating W3C date (we will always do without seconds)
   const month = (1 + date.getMonth()).toFixed().padStart(2, '0');
-  const day = date
-    .getDate()
-    .toFixed()
-    .padStart(2, '0');
-  const hours = date
-    .getHours()
-    .toFixed()
-    .padStart(2, '0');
-  const minutes = date
-    .getMinutes()
-    .toFixed()
-    .padStart(2, '0');
+  const day = date.getDate().toFixed().padStart(2, '0');
+  const hours = date.getHours().toFixed().padStart(2, '0');
+  const minutes = date.getMinutes().toFixed().padStart(2, '0');
   const offset = -date.getTimezoneOffset();
   const offsetHours = Math.abs(Math.floor(offset / 60))
     .toFixed()
@@ -55,30 +44,23 @@ export function getW3CDateString(value: string | Date): string {
 export function getDateFromW3CString(value: string): Date {
   if (!isValidW3CDateString(value))
     throw new TypeError(`Date string ${value} is now a valid W3C date string`);
-  const res = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})T(?<hours>\d{2}):(?<mins>\d{2})(?<tzSign>[+-])(?<tzHour>\d{2}):(?<tzMin>\d{2})/.exec(
-    value,
-  );
+  const res =
+    /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})T(?<hours>\d{2}):(?<mins>\d{2})(?<tzSign>[+-])(?<tzHour>\d{2}):(?<tzMin>\d{2})/.exec(
+      value,
+    );
   if (!res)
     throw new TypeError(`Date string ${value} is now a valid W3C date string`);
-  const {
-    year,
-    month,
-    day,
-    hours,
-    mins,
-    tzSign,
-    tzHour,
-    tzMin,
-  } = res.groups as {
-    year: string;
-    month: string;
-    day: string;
-    hours: string;
-    mins: string;
-    tzSign: '+' | '-';
-    tzHour: string;
-    tzMin: string;
-  };
+  const { year, month, day, hours, mins, tzSign, tzHour, tzMin } =
+    res.groups as {
+      year: string;
+      month: string;
+      day: string;
+      hours: string;
+      mins: string;
+      tzSign: '+' | '-';
+      tzHour: string;
+      tzMin: string;
+    };
   let utcdate = Date.UTC(
     parseInt(year, 10),
     parseInt(month, 10) - 1, // months are zero-offset (!)

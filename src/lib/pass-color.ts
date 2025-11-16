@@ -20,7 +20,8 @@ function is0to255(num: number): boolean {
 function getRgb(colorString: string): [number, number, number] {
   // short paths
   const string = colorString.trim();
-  if (string in colorNames) return (colorNames as any)[string];
+  if (string in colorNames)
+    return (colorNames as Record<string, [number, number, number]>)[string];
   if (/transparent/i.test(string)) return [0, 0, 0];
 
   // we don't need to recheck values because they are enforced by regexes

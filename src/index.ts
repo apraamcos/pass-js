@@ -1,2 +1,2 @@
-export { Template } from './template';
-export { Pass } from './pass';
+export { Template } from './template.js';
+export { Pass } from './pass.js';

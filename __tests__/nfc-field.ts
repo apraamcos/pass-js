@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest';
+
 import * as forge from 'node-forge';
 
 import { NFCField } from '../src/lib/nfc-fields';
@@ -17,33 +19,28 @@ describe('NFCField', () => {
   });
 
   it('decodes public key', () => {
-    const nfc = new NFCField(
-      {
-        message: 'test message',
-        encryptionPublicKey: TEST_PUBLIC_KEY.replace(/\n/g, '')
-          .replace('-----BEGIN PUBLIC KEY-----', '')
-          .replace('-----END PUBLIC KEY-----', ''),
-      },
-    );
-    expect(nfc.toJSON()).toEqual(
-        { 
-          message: nfc.message,
-          encryptionPublicKey: nfc.encryptionPublicKey
-        });
+    const nfc = new NFCField({
+      message: 'test message',
+      encryptionPublicKey: TEST_PUBLIC_KEY.replace(/\n/g, '')
+        .replace('-----BEGIN PUBLIC KEY-----', '')
+        .replace('-----END PUBLIC KEY-----', ''),
+    });
+    expect(nfc.toJSON()).toEqual({
+      message: nfc.message,
+      encryptionPublicKey: nfc.encryptionPublicKey,
+    });
   });
 
   it('add Base64 encoded public key', () => {
     const nfc = new NFCField();
     nfc.message = 'hello world';
     nfc.setPublicKey(TEST_PUBLIC_KEY);
-    expect(nfc.toJSON()).toEqual(
-      {
-        encryptionPublicKey: TEST_PUBLIC_KEY.replace(/\n/g, '')
-          .replace('-----BEGIN PUBLIC KEY-----', '')
-          .replace('-----END PUBLIC KEY-----', ''),
-        message: 'hello world',
-      },
-    );
+    expect(nfc.toJSON()).toEqual({
+      encryptionPublicKey: TEST_PUBLIC_KEY.replace(/\n/g, '')
+        .replace('-----BEGIN PUBLIC KEY-----', '')
+        .replace('-----END PUBLIC KEY-----', ''),
+      message: 'hello world',
+    });
   });
 
   it('throws on wrong algorithm public key or no public key', () => {

@@ -1,28 +1,25 @@
 // Generate a pass file.
 
-'use strict';
-
 import { toBuffer as createZip } from 'do-not-zip';
-
-import { getBufferHash } from './lib/getBufferHash';
-import { PassImages } from './lib/images';
-import { signManifest } from './lib/signManifest-forge';
-import { PassBase } from './lib/base-pass';
-import { ApplePass, Options } from './interfaces';
+import { getBufferHash } from './lib/getBufferHash.js';
+import { PassImages } from './lib/images.js';
+import { signManifest } from './lib/signManifest-forge.js';
+import { PassBase } from './lib/base-pass.js';
+import { ApplePass, Options } from './interfaces.js';
 
 // Create a new pass.
 //
 // template  - The template
 // fields    - Pass fields (description, serialNumber, logoText)
 export class Pass extends PassBase {
-  private readonly template: import('./template').Template;
+  private readonly template: import('./template.js').Template;
   // eslint-disable-next-line max-params
   constructor(
-    template: import('./template').Template,
+    template: import('./template.js').Template,
     fields: Partial<ApplePass> = {},
     images?: PassImages,
-    localization?: import('./lib/localizations').Localizations,
-    options?: Options
+    localization?: import('./lib/localizations.js').Localizations,
+    options?: Options,
   ) {
     super(fields, images, localization, options);
     this.template = template;
@@ -95,13 +92,10 @@ export class Pass extends PassBase {
     // adding manifest
     // Construct manifest here
     const manifestJson = JSON.stringify(
-      zip.reduce(
-        (res, { path, data }) => {
-          res[path] = getBufferHash(data);
-          return res;
-        },
-        {} as { [k: string]: string },
-      ),
+      zip.reduce((res, { path, data }) => {
+        res[path] = getBufferHash(data);
+        return res;
+      }, {} as { [k: string]: string }),
     );
     zip.push({ path: 'manifest.json', data: manifestJson });
 

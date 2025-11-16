@@ -1,3 +1,5 @@
+import { describe, it, expect, beforeEach, afterEach, test, beforeAll, afterAll } from 'vitest';
+
 import { normalizeLocale } from '../src/lib/normalize-locale';
 
 describe('normalizeLocale', () => {

@@ -1,6 +1,6 @@
 import forge from 'node-forge';
 
-import { NFCDictionary } from '../interfaces';
+import { NFCDictionary } from '../interfaces.js';
 
 /**
  * node-forge doesn't support ECDH used by Apple in NFC,

@@ -1,4 +1,4 @@
-'use strict';
+import { expect, test } from 'vitest';
 
 import { FieldsMap } from '../src/lib/fieldsMap';
 import { getW3CDateString } from '../src/lib/w3cdate';

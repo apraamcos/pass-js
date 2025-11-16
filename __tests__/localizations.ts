@@ -5,6 +5,7 @@ import { execFileSync } from 'child_process';
 import { randomBytes } from 'crypto';
 import { unlinkSync, mkdtempSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
+import { describe, it, expect } from 'vitest';
 
 import * as Localization from '../src/lib/localizations';
 
@@ -35,9 +36,8 @@ describe('Localizations files helpers', () => {
           encoding: 'utf8',
         },
       );
-      expect(stdout.trim().split(/\n/)).toEqual(
-        expect.arrayContaining([expect.toEndWith(': OK')]),
-      );
+      const lines = stdout.trim().split(/\n/);
+      expect(lines.some(line => line.endsWith(': OK'))).toBe(true);
     });
   }
   it('should read pass.strings file', async () => {
@@ -69,7 +69,7 @@ describe('Localizations files helpers', () => {
         encoding: 'utf8',
       });
       unlinkSync(stringsFileName);
-      expect(stdout.trim()).toEndWith(': OK');
+      expect(stdout.trim().endsWith(': OK')).toBe(true);
     });
   }
 
@@ -97,10 +97,11 @@ describe('Localizations files helpers', () => {
       const stdout = execFileSync('plutil', ['-lint', stringsFileName], {
         encoding: 'utf8',
       });
-      expect(stdout.trim()).toEndWith(': OK');
+      expect(stdout.trim().endsWith(': OK')).toBe(true);
     }
     unlinkSync(stringsFileName);
-    expect([...resRu]).toIncludeSameMembers([...resRu2]);
+    expect([...resRu]).toEqual(expect.arrayContaining([...resRu2]));
+    expect([...resRu]).toHaveLength([...resRu2].length);
   });
 
   it('should clone other instance if provided for constructor', () => {
@@ -110,10 +111,10 @@ describe('Localizations files helpers', () => {
       .add('fr', { key1: 'test fr key1', key2: 'test fr key2' });
     const loc2 = new Localization.Localizations(loc1);
     expect(loc2.size).toBe(2);
-    expect(loc2.get('fr').get('key2')).toBe('test fr key2');
+    expect(loc2.get('fr')!.get('key2')).toBe('test fr key2');
     // modify a key in original loc1
-    loc1.get('ru').set('key1', 'тест');
-    expect(loc2.get('ru').get('key1')).toBe('test key 1');
+    loc1.get('ru')!.set('key1', 'тест');
+    expect(loc2.get('ru')!.get('key1')).toBe('test key 1');
     expect(loc1.toArray()).toMatchSnapshot();
   });
 });

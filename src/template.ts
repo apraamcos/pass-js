@@ -2,21 +2,22 @@
  * Passbook are created from templates
  */
 
-'use strict';
-
 import http2 from 'http2';
 import { join } from 'path';
 import { promises as fs } from 'fs';
-
 import forge from 'node-forge';
-import { unsigned as crc32 } from 'buffer-crc32';
-
-import { Pass } from './pass';
-import { PASS_STYLES } from './constants';
-import { PassStyle, ApplePass, Options } from './interfaces';
-import { PassBase } from './lib/base-pass';
-import { unzipBuffer } from './lib/yazul-promisified';
+import { createRequire } from 'module';
 import { stripComments } from 'jsonc-parser';
+
+import { Pass } from './pass.js';
+import { PASS_STYLES } from './constants.js';
+import { PassStyle, ApplePass, Options } from './interfaces.js';
+import { PassBase } from './lib/base-pass.js';
+import { unzipBuffer } from './lib/yazul-promisified.js';
+
+const require = createRequire(import.meta.url);
+const crc32Module = require('buffer-crc32');
+const crc32 = crc32Module.unsigned;
 
 const {
   HTTP2_HEADER_METHOD,
@@ -39,8 +40,8 @@ export class Template extends PassBase {
   constructor(
     style?: PassStyle,
     fields: Partial<ApplePass> = {},
-    images?: import('./lib/images').PassImages,
-    localization?: import('./lib/localizations').Localizations,
+    images?: import('./lib/images.js').PassImages,
+    localization?: import('./lib/localizations.js').Localizations,
     options?: Options,
   ) {
     super(fields, images, localization, options);

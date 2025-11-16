@@ -4,8 +4,8 @@
  * @see {@link https://developer.apple.com/library/archive/documentation/UserExperience/Reference/PassKit_Bundle/Chapters/FieldDictionary.html}
  */
 
-import { PassColor } from './lib/pass-color';
-import { FieldsMap } from './lib/fieldsMap';
+import { PassColor } from './lib/pass-color.js';
+import { FieldsMap } from './lib/fieldsMap.js';
 
 export type DataDetectors =
   | 'PKDataDetectorTypePhoneNumber'

@@ -10,7 +10,7 @@ import { createInterface } from 'readline';
 import path from 'path';
 import { EOL } from 'os';
 
-import { normalizeLocale } from './normalize-locale';
+import { normalizeLocale } from './normalize-locale.js';
 
 /**
  * Just as in C, some characters must be prefixed with a backslash before you can include them in the string.
@@ -104,7 +104,7 @@ export class Localizations extends Map<string, Map<string, string>> {
     // copy localizations if provided
     super(
       v instanceof Localizations
-        ? [...v].map(([lang, map]) => [lang, new Map([...map])])
+        ? [...v].map(([lang, map]) => [lang, new Map(map)])
         : undefined,
     );
   }

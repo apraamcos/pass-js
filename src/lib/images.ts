@@ -2,17 +2,12 @@
  * Base PassImages class to add image filePath manipulation
  */
 
-'use strict';
-
 import { promisify } from 'util';
 import path from 'path';
 import { createReadStream, promises as fs } from 'fs';
-
 import imagesize from 'imagesize';
-
-import { IMAGES, DENSITIES } from '../constants';
-
-import { normalizeLocale } from './normalize-locale';
+import { IMAGES, DENSITIES } from '../constants.js';
+import { normalizeLocale } from './normalize-locale.js';
 
 interface ImageSizeResult {
   format: 'gif' | 'png' | 'jpeg';
