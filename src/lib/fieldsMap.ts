@@ -1,4 +1,6 @@
-import { Field, FieldDescriptor, DataStyleFormat } from '../interfaces.js';
+import type { Field, FieldDescriptor, DataStyleFormat } from '../interfaces.js';
+
+import { normalizeSemanticTags } from './semantic-tags.js';
 import { getW3CDateString } from './w3cdate.js';
 
 export class FieldsMap extends Map<string, FieldDescriptor> {
@@ -8,9 +10,13 @@ export class FieldsMap extends Map<string, FieldDescriptor> {
   toJSON(): Field[] | undefined {
     if (!this.size) return undefined;
     return [...this].map(([key, data]): Field => {
+      const field = { key, ...data } as Field;
       // Remap Date objects to string
-      if (data.value instanceof Date) data.value = getW3CDateString(data.value);
-      return { key, ...data };
+      if (field.value instanceof Date)
+        field.value = getW3CDateString(field.value);
+      if (field.semantics)
+        field.semantics = normalizeSemanticTags(field.semantics);
+      return field;
     });
   }
 
@@ -29,16 +35,14 @@ export class FieldsMap extends Map<string, FieldDescriptor> {
       );
     if (!('value' in data))
       throw new TypeError(
-        `To add a field you must provide a value field, received: ${JSON.stringify(
-          data,
-        )}`,
+        `To add a field you must provide a value field, received: ${JSON.stringify(data)}`,
       );
     if ('dateStyle' in data) {
       const date =
         data.value instanceof Date ? data.value : new Date(data.value);
       if (!Number.isFinite(date.getTime()))
         throw new TypeError(
-          `When dateStyle specified the value must be a valid Date instance or string, received ${data.value}`,
+          `When dateStyle specified the value must be a valid Date instance or string, received ${String(data.value)}`,
         );
       this.set(key, { ...data, value: date });
     } else this.set(key, data);
