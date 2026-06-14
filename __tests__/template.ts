@@ -97,6 +97,38 @@ describe('Template', () => {
     assert.equal(templ.passTypeIdentifier, 'pass.real');
   });
 
+  it('userInfo set on a Template does not bleed into stamped Passes', () => {
+    const t = new Template('generic', {
+      passTypeIdentifier: 'pass.x',
+      teamIdentifier: 'T',
+      organizationName: 'O',
+      description: 'd',
+      serialNumber: 's',
+    });
+    t.userInfo = { plan: 'free' };
+    const pass = t.createPass();
+    (pass.userInfo as { plan: string }).plan = 'pro';
+    assert.equal((t.userInfo as { plan: string }).plan, 'free');
+  });
+
+  it('parses a pass.json that contains JSONC comments', async () => {
+    // Exercises the in-repo stripJsonComments through the public load path.
+    const passJsonc = `{
+      // the pass format version
+      "formatVersion": 1,
+      "passTypeIdentifier": "pass.real", /* inline */
+      "teamIdentifier": "T",
+      "organizationName": "O",
+      "description": "d",
+      "serialNumber": "s",
+      "coupon": {}
+    }`;
+    const buf = writeZip([{ path: 'pass.json', data: passJsonc }]);
+    const templ = await Template.fromBuffer(buf);
+    assert.equal(templ.passTypeIdentifier, 'pass.real');
+    assert.equal(templ.style, 'coupon');
+  });
+
   it('loads an existing .pkpass buffer as a Template', async () => {
     const buffer = readFileSync(
       path.resolve(__dirname, './resources/passes/StoreCard.pkpass'),

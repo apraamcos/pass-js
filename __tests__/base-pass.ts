@@ -195,6 +195,28 @@ describe('PassBase', () => {
     assert.equal(bp.appLaunchURL, undefined);
   });
 
+  it('userInfo get/set round-trips and is in TOP_LEVEL_FIELDS', () => {
+    assert.ok(TOP_LEVEL_FIELDS.userInfo, 'userInfo registered as top-level');
+    const bp = new PassBase();
+    assert.equal(bp.userInfo, undefined);
+    bp.userInfo = { fav: 'latte', shots: 2 };
+    assert.deepEqual(bp.userInfo, { fav: 'latte', shots: 2 });
+    assert.deepEqual(JSON.parse(JSON.stringify(bp)).userInfo, {
+      fav: 'latte',
+      shots: 2,
+    });
+    bp.userInfo = undefined;
+    assert.equal(bp.userInfo, undefined);
+  });
+
+  it('userInfo is deep-cloned on set (no caller aliasing)', () => {
+    const bp = new PassBase();
+    const src = { nested: { a: 1 } };
+    bp.userInfo = src;
+    src.nested.a = 999; // mutate the original after assignment
+    assert.equal((bp.userInfo as { nested: { a: number } }).nested.a, 1);
+  });
+
   it('color values as RGB triplets', () => {
     const bp = new PassBase();
     assert.doesNotThrow(() => {
@@ -222,6 +244,13 @@ describe('PassBase', () => {
     assert.deepEqual(Array.from(bp.foregroundColor!), [0, 0, 255]);
     bp.stripColor = 'black';
     assert.deepEqual(Array.from(bp.stripColor!), [0, 0, 0]);
+    // named colors are case-insensitive (CSS Color L4)
+    bp.foregroundColor = 'ReD';
+    assert.deepEqual(Array.from(bp.foregroundColor!), [255, 0, 0]);
+    bp.foregroundColor = 'WHITE';
+    assert.deepEqual(Array.from(bp.foregroundColor!), [255, 255, 255]);
+    bp.foregroundColor = 'rebeccapurple';
+    assert.deepEqual(Array.from(bp.foregroundColor!), [102, 51, 153]);
     // should throw on bad color
     assert.throws(() => {
       bp.foregroundColor = 'byaka a ne color';

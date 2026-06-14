@@ -1,9 +1,6 @@
-[![npm (scoped)](https://img.shields.io/npm/v/@walletpass/pass-js.svg)](https://www.npmjs.com/package/@walletpass/pass-js)
-[![codecov](https://codecov.io/github/tinovyatkin/pass-js/graph/badge.svg)](https://codecov.io/github/tinovyatkin/pass-js)
-
 <img src="https://docs-assets.developer.apple.com/published/c104c9bff0/841b02dd-b78c-4cad-8da4-700761d34e14.png" alt="Apple Wallet logo" width="216" height="216" align="left">
 
-# @walletpass/pass-js
+# @apraamcos/pass-js
 
 <p align="center">A Node.js library for generating Apple Wallet passes with localizations, NFC, and web-service push updates. Written in TypeScript.</p>
 
@@ -11,23 +8,25 @@
 
 ## Installation
 
+This is a fork published to GitHub Packages. Point the `@apraamcos` scope at
+the GitHub registry (in your project `.npmrc`), then install:
+
 ```sh
-npm install @walletpass/pass-js
+# .npmrc
+@apraamcos:registry=https://npm.pkg.github.com
+```
+
+```sh
+npm install @apraamcos/pass-js
 # or
-yarn add @walletpass/pass-js
+pnpm add @apraamcos/pass-js
 ```
 
 ## Get your certificates
 
 To start, you'll need a certificate issued by [the iOS Provisioning Portal](https://developer.apple.com/ios/manage/passtypeids/index.action). You need one certificate per Pass Type ID.
 
-After adding this certificate to your Keychain, export it as a `.p12` file (Keychain Access → My Certificates → right-click → Export), then convert it into a `.pem` file using the `passkit-keys` command:
-
-```sh
-./bin/passkit-keys ./pathToKeysFolder
-```
-
-Or directly with `openssl`:
+After adding this certificate to your Keychain, export it as a `.p12` file (Keychain Access → My Certificates → right-click → Export), then convert it into a `.pem` file with `openssl`:
 
 ```sh
 openssl pkcs12 -in <exported_cert_and_private_key>.p12 -clcerts -out com.example.passbook.pem -passin pass:<private_key_password>
@@ -42,7 +41,7 @@ The [Apple Worldwide Developer Relations Certification Authority](https://www.ap
 A template carries the fields, images, and localizations shared between your passes. Use it to stamp out individual passes.
 
 ```js
-import { Template } from '@walletpass/pass-js';
+import { Template } from '@apraamcos/pass-js';
 
 // Create a Template from a local folder. `.load` reads all fields from
 // pass.json, all images, the com.example.passbook.pem private key, and
@@ -180,7 +179,7 @@ Adding images to a pass works exactly like adding them to a template (see above)
 If your fields contain [dates](https://developer.apple.com/library/archive/documentation/UserExperience/Reference/PassKit_Bundle/Chapters/FieldDictionary.html#//apple_ref/doc/uid/TP40012026-CH4-SW6), supply them as ISO 8601 strings with a timezone or as native `Date` instances:
 
 ```js
-import { constants } from '@walletpass/pass-js';
+import { constants } from '@apraamcos/pass-js';
 
 pass.primaryFields.add({
   key: 'updated',
@@ -279,4 +278,4 @@ If the pass file generates without errors but you can't open it on an iPhone, co
 
 ## License
 
-`@walletpass/pass-js` is [MIT licensed](LICENSE).
+`@apraamcos/pass-js` is [MIT licensed](LICENSE).

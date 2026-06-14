@@ -12,26 +12,31 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
           registry-url: "https://npm.pkg.github.com"
           scope: "@apraamcos"
-          cache: "npm"
+          cache: "pnpm"
       - name: Setup Git Configs
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
       - name: Install
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: Build
-        run: npm run build
+        run: pnpm run build
+      - name: Lint
+        run: pnpm run check
+      - name: Test
+        run: node --test "__tests__/*.ts"
       - name: Increase version number
-        run: npm version patch
+        run: pnpm version patch
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish
-        run: npm publish
+        run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Push

@@ -163,6 +163,11 @@ export const TOP_LEVEL_FIELDS: {
     type: 'string',
     templatable: true,
   },
+  userInfo: {
+    required: false,
+    type: Object,
+    templatable: true,
+  },
   // Expiration Keys
   expirationDate: {
     type: 'string', // W3C date, as a string

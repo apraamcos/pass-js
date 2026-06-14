@@ -60,6 +60,9 @@ export type FieldDescriptor = {
   changeMessage?: string;
   dataDetectorTypes?: DataDetectors[];
   semantics?: SemanticTags;
+  // eventTicket auxiliary fields may declare a row (0 or 1) to render
+  // two rows of auxiliary fields. Ignored by other pass styles.
+  row?: 0 | 1;
 } & (
   | {
       value: string;
@@ -195,8 +198,10 @@ export interface PassCompanionAppKeys {
    * For example, a pass for a cafe could include information about
    * the user’s favorite drink and sandwich in a machine-readable form
    * for the companion app to read, making it easy to place an order for “the usual” from the app.
+   *
+   * Stored and emitted verbatim; Wallet never interprets it.
    */
-  userInfo?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  userInfo?: Record<string, unknown>;
 }
 
 export interface PassSemanticKeys {

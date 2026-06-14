@@ -25,6 +25,16 @@ test('FieldsMap serializes semantic tags per-field', () => {
   );
 });
 
+test('FieldsMap carries the eventTicket row key through serialization', () => {
+  const fields = new FieldsMap();
+  fields.add({ key: 'gate', label: 'Gate', value: 'A12', row: 1 });
+  assert.partialDeepStrictEqual(fields.get('gate'), { row: 1 });
+  assert.equal(
+    JSON.stringify(fields),
+    '[{"key":"gate","label":"Gate","value":"A12","row":1}]',
+  );
+});
+
 test('FieldsMap Class', () => {
   const fields = new FieldsMap();
   // should not add empty arrays if not needed

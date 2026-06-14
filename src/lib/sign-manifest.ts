@@ -6,29 +6,23 @@ import {
 } from 'node:crypto';
 import type { KeyObject } from 'node:crypto';
 
-import * as asn1js from 'asn1js';
 import {
-  Certificate as PkiCertificate,
-  ContentInfo,
-  EncapsulatedContentInfo,
-  IssuerAndSerialNumber,
-  SignedData,
-  SignerInfo,
-  SignedAndUnsignedAttributes,
-  Attribute,
-  AlgorithmIdentifier,
-} from 'pkijs';
+  sequence,
+  set,
+  contextConstructed,
+  octetString,
+  nullValue,
+  integer,
+  integerFromBytes,
+  objectIdentifier,
+  time,
+  raw,
+  extractCertificateInfo,
+} from './der.js';
 
-// Convert a PEM certificate into a pkijs Certificate by going through the
-// node:crypto X509Certificate parser (which accepts PEM and emits DER in .raw).
-function parsePkiCertificate(pem: string): PkiCertificate {
-  const der = new X509Certificate(pem).raw;
-  const ab = der.buffer.slice(der.byteOffset, der.byteOffset + der.byteLength);
-  const asn1 = asn1js.fromBER(ab);
-  if (asn1.offset === -1) {
-    throw new Error('Failed to parse X.509 certificate: invalid ASN.1');
-  }
-  return new PkiCertificate({ schema: asn1.result });
+// Return the DER bytes of a PEM (or DER) X.509 certificate via node:crypto.
+function certificateDer(pem: string): Buffer {
+  return Buffer.from(new X509Certificate(pem).raw);
 }
 
 // Apple WWDR Certification Authority — G4
@@ -71,10 +65,12 @@ const OID_CONTENT_TYPE = '1.2.840.113549.1.9.3';
 const OID_MESSAGE_DIGEST = '1.2.840.113549.1.9.4';
 const OID_SIGNING_TIME = '1.2.840.113549.1.9.5';
 const OID_DATA = '1.2.840.113549.1.7.1';
+const OID_SIGNED_DATA = '1.2.840.113549.1.7.2';
 const OID_SHA1 = '1.3.14.3.2.26';
 const OID_RSA_ENCRYPTION = '1.2.840.113549.1.1.1';
 
-const APPLE_WWDR_CA = parsePkiCertificate(APPLE_WWDR_CA_PEM);
+const APPLE_WWDR_CA = new X509Certificate(APPLE_WWDR_CA_PEM);
+const APPLE_WWDR_CA_DER = Buffer.from(APPLE_WWDR_CA.raw);
 
 // Emit a process warning if the bundled WWDR cert is within 90 days of
 // expiry (or already expired). The 2013–2023 G1 silently expired and every
@@ -86,7 +82,7 @@ const APPLE_WWDR_CA = parsePkiCertificate(APPLE_WWDR_CA_PEM);
 //   node --disable-warning=WalletPassWWDRExpiring app.js
 //   process.on('warning', w => { if (w.code === 'WALLETPASS_WWDR_EXPIRED') ... })
 const WWDR_WARN_WINDOW_MS = 90 * 24 * 60 * 60 * 1000;
-const wwdrNotAfter = APPLE_WWDR_CA.notAfter.value;
+const wwdrNotAfter = new Date(APPLE_WWDR_CA.validTo);
 const msUntilExpiry = wwdrNotAfter.getTime() - Date.now();
 if (msUntilExpiry < WWDR_WARN_WINDOW_MS) {
   const when = wwdrNotAfter.toISOString().slice(0, 10);
@@ -120,7 +116,8 @@ export function signManifest(
   privateKey: string | KeyObject,
   manifestJson: string,
 ): Buffer {
-  const signerCert = parsePkiCertificate(certificatePem);
+  const signerCertDer = certificateDer(certificatePem);
+  const { issuer, serialNumber } = extractCertificateInfo(signerCertDer);
 
   const keyObject =
     typeof privateKey === 'string' ? createPrivateKey(privateKey) : privateKey;
@@ -128,68 +125,92 @@ export function signManifest(
   const manifestBytes = Buffer.from(manifestJson, 'utf8');
   const digest = createHash('sha1').update(manifestBytes).digest();
 
-  // Authenticated attributes: content-type, message-digest, signing-time.
-  // These are what Apple requires in the SignerInfo.
-  const signedAttrs = new SignedAndUnsignedAttributes({
-    type: 0,
-    attributes: [
-      new Attribute({
-        type: OID_CONTENT_TYPE,
-        values: [new asn1js.ObjectIdentifier({ value: OID_DATA })],
-      }),
-      new Attribute({
-        type: OID_MESSAGE_DIGEST,
-        values: [new asn1js.OctetString({ valueHex: digest })],
-      }),
-      new Attribute({
-        type: OID_SIGNING_TIME,
-        values: [new asn1js.UTCTime({ valueDate: new Date() })],
-      }),
-    ],
-  });
-
-  const signerInfo = new SignerInfo({
-    version: 1,
-    sid: new IssuerAndSerialNumber({
-      issuer: signerCert.issuer,
-      serialNumber: signerCert.serialNumber,
-    }),
-    digestAlgorithm: new AlgorithmIdentifier({ algorithmId: OID_SHA1 }),
-    signedAttrs,
-    signatureAlgorithm: new AlgorithmIdentifier({
-      algorithmId: OID_RSA_ENCRYPTION,
-    }),
-  });
-
-  // Serialize the signed attributes (SET OF), sign with RSA-SHA1.
-  // Per RFC 5652 §5.4, the IMPLICIT [0] is replaced with an explicit SET tag
-  // for the signed bytes.
-  const attrsDer = Buffer.from(
-    (signedAttrs.toSchema() as asn1js.Constructed).toBER(false),
+  // AlgorithmIdentifier ::= SEQUENCE { algorithm OID, parameters NULL }
+  const sha1Algorithm = sequence(objectIdentifier(OID_SHA1), nullValue());
+  const rsaAlgorithm = sequence(
+    objectIdentifier(OID_RSA_ENCRYPTION),
+    nullValue(),
   );
-  // Replace the IMPLICIT [0] tag (0xA0) with explicit SET (0x31).
-  const toSign = Buffer.concat([Buffer.from([0x31]), attrsDer.subarray(1)]);
 
-  const signature = createSign('sha1').update(toSign).sign(keyObject);
-  signerInfo.signature = new asn1js.OctetString({ valueHex: signature });
+  // Each signed attribute: SEQUENCE { attrType OID, attrValues SET OF ... }
+  const attrContentType = sequence(
+    objectIdentifier(OID_CONTENT_TYPE),
+    set(objectIdentifier(OID_DATA)),
+  );
+  const attrMessageDigest = sequence(
+    objectIdentifier(OID_MESSAGE_DIGEST),
+    set(octetString(digest)),
+  );
+  const attrSigningTime = sequence(
+    objectIdentifier(OID_SIGNING_TIME),
+    set(time(new Date())),
+  );
 
-  const signedData = new SignedData({
-    version: 1,
-    digestAlgorithms: [new AlgorithmIdentifier({ algorithmId: OID_SHA1 })],
-    encapContentInfo: new EncapsulatedContentInfo({
-      eContentType: OID_DATA,
-      // No eContent — detached signature.
-    }),
-    certificates: [signerCert, APPLE_WWDR_CA],
-    signerInfos: [signerInfo],
-  });
+  // The signed bytes are the SignedAttributes as an EXPLICIT SET OF (tag
+  // 0x31, DER-sorted), per RFC 5652 §5.4. The very same encoding appears in
+  // the SignerInfo as an IMPLICIT [0] (tag 0xA0) — identical content/length,
+  // only the leading tag byte differs. Deriving one from the other keeps the
+  // signed bytes and the on-wire bytes byte-for-byte consistent.
+  const signedAttrsForSigning = set(
+    attrContentType,
+    attrMessageDigest,
+    attrSigningTime,
+  );
+  const signedAttrsImplicit = Buffer.concat([
+    Buffer.from([0xa0]),
+    signedAttrsForSigning.subarray(1),
+  ]);
 
-  // Wrap in ContentInfo.
-  const contentInfo = new ContentInfo({
-    contentType: '1.2.840.113549.1.7.2', // id-signedData
-    content: signedData.toSchema(true),
-  });
+  const signature = createSign('sha1')
+    .update(signedAttrsForSigning)
+    .sign(keyObject);
 
-  const ber = contentInfo.toSchema().toBER(false);
-  return Buffer.from(ber);
+  // SignerInfo ::= SEQUENCE {
+  //   version INTEGER (1),
+  //   sid IssuerAndSerialNumber,
+  //   digestAlgorithm AlgorithmIdentifier,
+  //   signedAttrs [0] IMPLICIT SET OF Attribute,
+  //   signatureAlgorithm AlgorithmIdentifier,
+  //   signature OCTET STRING }
+  const issuerAndSerial = sequence(raw(issuer), integerFromBytes(serialNumber));
+  const signerInfo = sequence(
+    integer(1),
+    issuerAndSerial,
+    sha1Algorithm,
+    signedAttrsImplicit,
+    rsaAlgorithm,
+    octetString(signature),
+  );
+
+  // SignedData ::= SEQUENCE {
+  //   version INTEGER (1),
+  //   digestAlgorithms SET OF AlgorithmIdentifier,
+  //   encapContentInfo EncapsulatedContentInfo,
+  //   certificates [0] IMPLICIT SET OF Certificate OPTIONAL,
+  //   signerInfos SET OF SignerInfo }
+  const encapContentInfo = sequence(objectIdentifier(OID_DATA)); // detached: no eContent
+  // certificates [0] IMPLICIT SET OF Certificate. Build a DER-sorted SET
+  // then swap the leading SET tag (0x31) for the IMPLICIT [0] tag (0xA0).
+  const certificatesSet = set(raw(signerCertDer), APPLE_WWDR_CA_DER);
+  const certificates = Buffer.concat([
+    Buffer.from([0xa0]),
+    certificatesSet.subarray(1),
+  ]);
+  const signedData = sequence(
+    integer(1),
+    set(sha1Algorithm),
+    encapContentInfo,
+    certificates,
+    set(signerInfo),
+  );
+
+  // ContentInfo ::= SEQUENCE {
+  //   contentType OID (id-signedData),
+  //   content [0] EXPLICIT SignedData }
+  const contentInfo = sequence(
+    objectIdentifier(OID_SIGNED_DATA),
+    contextConstructed(0, signedData),
+  );
+
+  return contentInfo;
 }

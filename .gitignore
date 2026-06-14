@@ -1,13 +1,2 @@
 node_modules
-.dropbox
-*.tgz
-coverage/*
-.DS_Store
-.app.yml
 dist/*
-junit.xml
-
-# Personal Claude Code / AI-assistant notes that shouldn't be shared
-.claude.local.md
-.claude/
-

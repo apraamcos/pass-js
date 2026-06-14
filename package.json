@@ -1,13 +1,12 @@
 {
   "name": "@apraamcos/pass-js",
-  "description": "Apple Wallet Pass generating and pushing updates from Node.js",
   "author": "Konstantin Vyatkin <tino@vtkn.io>",
   "version": "7.0.0",
-  "homepage": "https://github.com/apraamcos/pass-js",
   "license": "MIT",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
+  "packageManager": "pnpm@11.6.0",
   "engines": {
     "node": ">=24.12.0"
   },
@@ -21,34 +20,25 @@
   },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
-  "bin": {
-    "passkit-keys": "bin/passkit-keys"
-  },
   "files": [
     "dist/**/*.js",
-    "dist/**/*.d.ts",
-    "dist/**/*.d.ts.map",
-    "bin/passkit-keys"
+    "dist/**/*.d.ts"
   ],
   "scripts": {
-    "build": "tsgo --project tsconfig.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "pnpm run clean && tsgo --project tsconfig.json",
     "lint": "oxlint --type-aware && oxfmt --check src __tests__",
-    "check": "oxlint --type-aware && oxfmt --check src __tests__",
+    "check": "pnpm run lint",
     "format": "oxfmt src __tests__",
-    "test": "npm run build && node --enable-source-maps --test \"__tests__/*.ts\"",
-    "prepublishOnly": "npm run build"
+    "test": "pnpm run build && node --test \"__tests__/*.ts\"",
+    "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0",
-    "@typescript/native-preview": "7.0.0-dev.20260509.2",
-    "oxfmt": "^0.48.0",
-    "oxlint": "^1.63.0",
-    "oxlint-tsgolint": "^0.22.1"
-  },
-  "dependencies": {
-    "color-name": "^2.0.0",
-    "pkijs": "^3.4.0",
-    "strip-json-comments": "^5.0.3"
+    "@types/node": "^25.9.3",
+    "@typescript/native-preview": "7.0.0-dev.20260613.1",
+    "oxfmt": "^0.54.0",
+    "oxlint": "^1.69.0",
+    "oxlint-tsgolint": "^0.23.0"
   },
   "keywords": [
     "apple",
@@ -62,8 +52,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/apraamcos/pass-js.git"
-  },
-  "bugs": {
-    "url": "https://github.com/apraamcos/pass-js/issues"
   }
 }

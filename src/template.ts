@@ -5,13 +5,12 @@ import { createPrivateKey, type KeyObject, X509Certificate } from 'node:crypto';
 import { join } from 'node:path';
 import { readFile, readdir } from 'node:fs/promises';
 
-import stripJsonComments from 'strip-json-comments';
-
 import { Pass } from './pass.js';
 import { PASS_STYLES } from './constants.js';
 import type { PassStyle, ApplePass, Options } from './interfaces.js';
 import { PassBase } from './lib/base-pass.js';
 import { readZip } from './lib/zip.js';
+import { stripJsonComments } from './lib/strip-json-comments.js';
 import type { PassImages } from './lib/images.js';
 import type { Localizations } from './lib/localizations.js';
 

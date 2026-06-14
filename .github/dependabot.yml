@@ -13,8 +13,6 @@ updates:
         dependency-type: development
         exclude-patterns:
           - "@types/*"
-      prod-dependencies:
-        dependency-type: production
     # tsgo preview builds change frequently; let dependabot bump but
     # review before merging.
     ignore:

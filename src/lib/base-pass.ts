@@ -236,6 +236,21 @@ export class PassBase extends PassStructure {
   }
 
   /**
+   * Custom information for companion apps. Carried through to the
+   * `userInfo` top-level key in pass.json untouched by Wallet.
+   *
+   * Stored as a deep clone so a Template's userInfo can't bleed into
+   * (or be mutated by) the Passes stamped from it.
+   */
+  get userInfo(): ApplePass['userInfo'] {
+    return this.fields.userInfo;
+  }
+  set userInfo(v: ApplePass['userInfo']) {
+    if (v === undefined || v === null) delete this.fields.userInfo;
+    else this.fields.userInfo = structuredClone(v);
+  }
+
+  /**
    * Brief description of the pass, used by the iOS accessibility technologies.
    * Don’t try to include all of the data on the pass in its description,
    * just include enough detail to distinguish passes of the same type.

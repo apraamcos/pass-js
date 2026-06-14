@@ -1,8 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import * as path from 'node:path';
+import * as os from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 
 import {
   readPngDimensions,
@@ -71,10 +72,15 @@ describe('png-size', () => {
   });
 
   it('rejects a truncated file via the streaming reader', async () => {
-    // Point at a tiny text file that clearly isn't a PNG.
-    await assert.rejects(
-      () => readPngDimensionsFromFile(path.resolve(__dirname, '../.npmrc')),
-      /PNG/,
-    );
+    // Write a self-contained text file that clearly isn't a PNG, so the
+    // test never depends on any repo file existing.
+    const dir = mkdtempSync(path.join(os.tmpdir(), 'pass-js-png-'));
+    const notPng = path.join(dir, 'not-a-png.txt');
+    writeFileSync(notPng, 'this is plainly not a PNG file\n');
+    try {
+      await assert.rejects(() => readPngDimensionsFromFile(notPng), /PNG/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
