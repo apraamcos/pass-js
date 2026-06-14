@@ -1,7 +1,7 @@
 {
   "name": "@apraamcos/pass-js",
   "author": "Konstantin Vyatkin <tino@vtkn.io>",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "license": "MIT",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
